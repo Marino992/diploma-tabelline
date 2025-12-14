@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gioco delle Tabelline</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+      background: linear-gradient(#a0d8ff, #fefefe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .game {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .tooltip {
+      display: none;
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4da6ff;
+      color: white;
+      padding: 15px;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      width: 90%;
+      box-sizing: border-box;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    .title:hover + .tooltip,
+    .title:active + .tooltip {
+      display: block;
+    }
+
+    .question {
+      font-size: 2.2rem;
+      margin: 20px 0;
+    }
+
+    input {
+      font-size: 2rem;
+      width: 100%;
+      padding: 15px;
+      text-align: center;
+      border-radius: 15px;
+      border: 3px solid #4da6ff;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      font-size: 1.8rem;
+      padding: 15px;
+      border-radius: 20px;
+      border: none;
+      background: #4da6ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .feedback {
+      font-size: 1.5rem;
+      margin-top: 15px;
+      min-height: 2em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game" id="game">
+  <h1 class="title">🧮 Tabelline <span class="info">ℹ️</span></h1>
+  <div class="tooltip">Gioca con le tabelline da 1 a 10!<br>Se rispondi a tutte le domande correttamente ottieni il 🎓 <strong>Diploma delle Tabelline</strong>!</div>
+  <div class="question" id="question"></div>
+  <input type="number" id="answer" placeholder="Scrivi qui">
+  <button onclick="checkAnswer()">👉 Rispondi</button>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+  const totalQuestions = 10;
+  let current = 0;
+  let score = 0;
+  let a, b;
+
+  function newQuestion() {
+    a = Math.floor(Math.random() * 10) + 1;
+    b = Math.floor(Math.random() * 10) + 1;
+    document.getElementById('question').textContent = `${a} × ${b}`;
+    document.getElementById('answer').value = '';
+    document.getElementById('answer').focus();
+  }
+
+  function checkAnswer() {
+    const answer = Number(document.getElementById('answer').value);
+    const feedback = document.getElementById('feedback');
+
+    if (answer === a * b) {
+      score++;
+      feedback.textContent = '🎉 Bravissimo!';
+    } else {
+      feedback.textContent = `❌ No! Era ${a * b}`;
+    }
+
+    current++;
+
+    if (current < totalQuestions) {
+      setTimeout(() => {
+        feedback.textContent = '';
+        newQuestion();
+      }, 1000);
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    let message = '';
+
+    if (score === totalQuestions) {
+      message = '🏆 Sei un campione delle tabelline!<br><br>🎓 Hai ottenuto il <strong>Diploma delle Tabelline</strong>!';
+      document.getElementById('game').innerHTML = `
+        <h1>🎓 Diploma delle Tabelline</h1>
+        <p style="font-size:1.6rem">Complimenti! Hai risposto correttamente a tutte le domande!</p>
+        <div style="border:4px dashed #4da6ff; padding:20px; margin:20px 0; border-radius:20px; font-size:1.4rem">
+          <p>Questo diploma certifica che</p>
+          <h2>🏅 Sei bravissimo nelle tabelline!</h2>
+          <p>Continua così! 💪</p>
+        </div>
+        <button onclick="window.print()">🖨️ Stampa diploma</button>
+        <button onclick="location.reload()" style="margin-top:10px">🔄 Rigioca</button>
+      `;
+      return;
+    } else if (score >= 6) {
+      message = `💪 Bravo! Hai fatto ${score} su ${totalQuestions}. Allenati ancora!`;
+    } else {
+      message = `😕 Solo ${score} su ${totalQuestions}. Serve un po’ di allenamento!`;
+    }
+
+    document.getElementById('game').innerHTML = `
+      <h1>🎯 Fine gioco</h1>
+      <p style="font-size:1.6rem">${message}</p>
+      <button onclick="location.reload()">🔄 Rigioca</button>
+    `;
+  }
+
+  newQuestion();
+</script>
+
+</body>
+</html>
+
